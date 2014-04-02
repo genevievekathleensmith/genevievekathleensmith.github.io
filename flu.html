@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+
+text {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	pointer-events: none;
+}
+
+path:hover {fill : orange; stroke: orange}
+
+body{margin:0px;}
+.h,.v{stroke:black;stroke-dasharray:4 4;stroke-width:1;stroke-opacity:.5;}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+</style>
+
+<body>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+
+var width = 750,
+	height = 750,
+	margin = 100;
+	
+var svg = d3.select("body").append("svg")
+	.attr("width",width)
+	.attr("height",height);
+
+svg.append("foreignObject")
+    .attr("width", 200)
+    .attr("height", 500)
+    .attr("x", 20)
+    .attr("y", 20)
+  .append("xhtml:body")
+    .style("font", "12px 'Helvetica Neue'")
+    .html("<h1>Flu mortality trends across England and Wales during the 1918 flu pandemic</h1><p>Changes can be seen across space. And through time.<p>The radius of each circle represents the per-capita mortality rate in that location.</p></p>Below are circles indicating mortality rates of 10, 50, and 100 deaths per 1000 people.");
+
+var legend = svg.selectAll("ellipse")
+	.data([100,50,10])
+	.enter()
+	.append("ellipse")
+	.attr("cx", 125)
+	.attr("cy", function(d) {return 550 - d})
+	.attr("rx", function(d) {return d})
+	.attr("ry", function(d) {return d})
+	.attr("fill","red")
+	.attr("stroke","white")
+	.attr("opacity",.5);
+
+
+var x = d3.scale.linear()
+	.domain([0,660000])
+	.range([margin,width-margin]);
+
+var y = d3.scale.linear()
+	.domain([0,660000])
+	.range([height-margin,margin]);
+
+var r = d3.scale.linear()
+	.domain([0,100])
+	.range([0,50]);
+
+//var o = d3.scale.linear()
+//	.domain([10000,10000])
+//	.range([.5,1]);
+
+//var c = d3.scale.category10()
+//	.domain(["Africa","America","Asia","Europe","Ocenaia"]);
+
+var xAxis = d3.svg.axis()
+	.scale(x)
+	.orient("bottom");
+
+var yAxis = d3.svg.axis()
+	.scale(y)
+	.orient("left");
+
+//svg.append("g")
+//	.attr("class","axis")
+//	.attr("transform","translate(0," + (height - margin) + ")")
+//	.call(xAxis);
+
+//svg.append("g")
+//	.attr("class","axis")
+//	.attr("transform","translate(" + margin + ",0)")
+//	.call(yAxis);
+
+//svg.selectAll(".h").data(d3.range(-8,10,2)).enter()
+//	.append("line").classed("h",1)
+//	.attr("x1",margin).attr("x2",height-margin)
+//	.attr("y1",y).attr("y2",y)
+
+//svg.selectAll(".v").data(d3.range(1,5)).enter()
+//	.append("line").classed("v",1)
+//	.attr("y1",margin).attr("y2",width-margin)
+//	.attr("x1",x).attr("x2",x)
+
+d3.csv("more_geo.csv",function(csv){
+//d3.csv("all.csv",function(csv){
+//d3.csv("england.csv",function(csv){
+
+//			var group = svg.append("g")
+//				.attr("transform", "translate(1,1)");
+			
+//			var line = d3.svg.line()
+//				.x(function (d) { return d.x; })
+//				.y(function (d) { return 800-d.y; })
+				
+//			group.selectAll("path")
+//				.data([csv])
+//				.enter()
+//				.append("path")
+//				.attr("d",line)
+//				.attr("fill","cornflowerblue")
+//				.attr("stroke","cornflowerblue")
+//				.attr("stroke-width",2)
+
+	svg.selectAll("line")
+		.data(csv)
+		.enter()
+		.append("line")
+		.attr("x1",function(d) {return x(+d.V1);})
+		.attr("y1",function(d) {return y(+d.V2);})
+		.attr("x2",function(d) {return x(+d.V3);})
+		.attr("y2",function(d) {return y(+d.V4);})
+		.attr("stroke-width", 1)
+		.attr("stroke", "grey") 
+		})
+
+
+d3.csv("EnglandAndWales_temp.csv", function(csv) {
+
+//	csv.sort(function(a,b) { return b.population-a.population; });
+	var factor = 2;
+
+//	svg.append("text")
+//		.text("hi")
+//		.attr("x",600)
+//		.attr("y",50)
+
+	svg.selectAll("circle")
+		.data(csv)
+		.enter()
+		.append("circle")
+		.attr("cx",function(d) {return x(+d.Easting);})
+		.attr("cy",function(d) {return y(+d.Northing);})
+		.attr("r",function(d) {return r(0);})
+		.attr("stroke","white")
+		.attr("fill","red")
+		.attr("opacity",0.5)
+		
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.attr("r",function(d) {return r(+d.week_1*factor);})
+	
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(1000)
+		.attr("r",function(d) {return r(+d.week_2*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(2000)
+		.attr("r",function(d) {return r(+d.week_3*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(3000)
+		.attr("r",function(d) {return r(+d.week_4*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(4000)
+		.attr("r",function(d) {return r(+d.week_5*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(5000)
+		.attr("r",function(d) {return r(+d.week_6*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(6000)
+		.attr("r",function(d) {return r(+d.week_7*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(7000)
+		.attr("r",function(d) {return r(+d.week_8*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(8000)
+		.attr("r",function(d) {return r(+d.week_9*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(9000)
+		.attr("r",function(d) {return r(+d.week_10*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(10000)
+		.attr("r",function(d) {return r(+d.week_11*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(11000)
+		.attr("r",function(d) {return r(+d.week_12*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(12000)
+		.attr("r",function(d) {return r(+d.week_13*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(13000)
+		.attr("r",function(d) {return r(+d.week_14*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(14000)
+		.attr("r",function(d) {return r(+d.week_15*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(15000)
+		.attr("r",function(d) {return r(+d.week_16*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(16000)
+		.attr("r",function(d) {return r(+d.week_17*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(17000)
+		.attr("r",function(d) {return r(+d.week_18*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(18000)
+		.attr("r",function(d) {return r(+d.week_19*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(19000)
+		.attr("r",function(d) {return r(+d.week_20*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(20000)
+		.attr("r",function(d) {return r(+d.week_21*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(21000)
+		.attr("r",function(d) {return r(+d.week_22*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(22000)
+		.attr("r",function(d) {return r(+d.week_23*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(23000)
+		.attr("r",function(d) {return r(+d.week_24*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(24000)
+		.attr("r",function(d) {return r(+d.week_25*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(25000)
+		.attr("r",function(d) {return r(+d.week_26*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(26000)
+		.attr("r",function(d) {return r(+d.week_27*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(27000)
+		.attr("r",function(d) {return r(+d.week_28*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(28000)
+		.attr("r",function(d) {return r(+d.week_29*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(29000)
+		.attr("r",function(d) {return r(+d.week_30*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(30000)
+		.attr("r",function(d) {return r(+d.week_31*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(31000)
+		.attr("r",function(d) {return r(+d.week_32*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(32000)
+		.attr("r",function(d) {return r(+d.week_33*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(33000)
+		.attr("r",function(d) {return r(+d.week_34*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(34000)
+		.attr("r",function(d) {return r(+d.week_35*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(35000)
+		.attr("r",function(d) {return r(+d.week_36*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(36000)
+		.attr("r",function(d) {return r(+d.week_37*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(37000)
+		.attr("r",function(d) {return r(+d.week_38*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(38000)
+		.attr("r",function(d) {return r(+d.week_39*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(39000)
+		.attr("r",function(d) {return r(+d.week_40*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(40000)
+		.attr("r",function(d) {return r(+d.week_41*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(41000)
+		.attr("r",function(d) {return r(+d.week_42*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(42000)
+		.attr("r",function(d) {return r(+d.week_43*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(43000)
+		.attr("r",function(d) {return r(+d.week_44*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(44000)
+		.attr("r",function(d) {return r(+d.week_45*factor);})
+
+	svg.selectAll("circle")
+		.transition().duration(1000)
+		.delay(45000)
+		.attr("r",function(d) {return r(+d.week_46*factor);})
+
+
+	})
+
+
+
+</script>
+
+
+
+</body>
