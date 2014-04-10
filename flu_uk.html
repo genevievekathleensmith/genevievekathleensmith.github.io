@@ -185,6 +185,8 @@ d3.csv("EnglandAndWales.csv", function(csv) {
 		}
 	}
 
+	datesWithHeaders.sort(function (a, b) { return a.date - b.date; });
+
 	for (var i = 0; i < datesWithHeaders.length; i++) {
 		var dateWithHeader = datesWithHeaders[i], header = dateWithHeader.header;
 
