@@ -175,13 +175,23 @@ d3.csv("EnglandAndWales.csv", function(csv) {
 		
 	var arbitraryRow = csv[0];
 	var headers = d3.keys(arbitraryRow);
-	var dateHeaders = headers.filter(parseDateHeader);
+	var datesWithHeaders = [];
 
-	for (var i = 0; i < dateHeaders.length; i++) {
+	for (var i = 0; i < headers.length; i++) {
+		var header = headers[i], date = parseDateHeader(header);
+
+		if (date) {
+			datesWithHeaders.push({ date: date, header: header });
+		}
+	}
+
+	for (var i = 0; i < datesWithHeaders.length; i++) {
+		var dateWithHeader = datesWithHeaders[i], header = dateWithHeader.header;
+
 		svg.selectAll("circle")
 			.transition().duration(1000)
 			.delay(i * 1000)
-			.attr("r",function(d) {return r(+d[dateHeaders[i]]*factor);});
+			.attr("r",function(d) {return r(+d[header]*factor);});
 	}
 
 	})
