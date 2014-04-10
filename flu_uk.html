@@ -152,7 +152,7 @@ var parseDateHeader = function (header) {
 	}
 };
 
-d3.csv("EnglandAndWales_temp.csv", function(csv) {
+d3.csv("EnglandAndWales.csv", function(csv) {
 
 //	csv.sort(function(a,b) { return b.population-a.population; });
 	var factor = 2;
@@ -173,11 +173,15 @@ d3.csv("EnglandAndWales_temp.csv", function(csv) {
 		.attr("fill","red")
 		.attr("opacity",0.5)
 		
-	for (var week = 1; week <= 46; week++) {
+	var arbitraryRow = csv[0];
+	var headers = d3.keys(arbitraryRow);
+	var dateHeaders = headers.filter(parseDateHeader);
+
+	for (var i = 0; i < dateHeaders.length; i++) {
 		svg.selectAll("circle")
 			.transition().duration(1000)
-			.delay((week - 1) * 1000)
-			.attr("r",function(d) {return r(+d["week_" + week]*factor);});
+			.delay(i * 1000)
+			.attr("r",function(d) {return r(+d[dateHeaders[i]]*factor);});
 	}
 
 	})
