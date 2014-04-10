@@ -142,6 +142,16 @@ d3.csv("more_geo.csv",function(csv){
 		})
 
 
+var parseDateHeader = function (header) {
+	var match = header.match(/^X(\d+)\.(\d+)\.(\d+)$/);
+
+	if (match) {
+		var month = parseInt(match[1]) - 1, day = parseInt(match[2]), year = parseInt(match[3]);
+
+		return new Date(year, month, day);
+	}
+};
+
 d3.csv("EnglandAndWales_temp.csv", function(csv) {
 
 //	csv.sort(function(a,b) { return b.population-a.population; });
