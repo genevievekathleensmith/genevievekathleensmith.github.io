@@ -152,6 +152,24 @@ var parseDateHeader = function (header) {
 	}
 };
 
+var getDatesWithHeaders = function (csv) {
+	var arbitraryRow = csv[0];
+	var headers = d3.keys(arbitraryRow);
+	var datesWithHeaders = [];
+
+	for (var i = 0; i < headers.length; i++) {
+		var header = headers[i], date = parseDateHeader(header);
+
+		if (date) {
+			datesWithHeaders.push({ date: date, header: header });
+		}
+	}
+
+	datesWithHeaders.sort(function (a, b) { return a.date - b.date; });
+
+	return datesWithHeaders;
+};
+
 d3.csv("EnglandAndWales.csv", function(csv) {
 
 //	csv.sort(function(a,b) { return b.population-a.population; });
@@ -173,19 +191,7 @@ d3.csv("EnglandAndWales.csv", function(csv) {
 		.attr("fill","red")
 		.attr("opacity",0.5)
 		
-	var arbitraryRow = csv[0];
-	var headers = d3.keys(arbitraryRow);
-	var datesWithHeaders = [];
-
-	for (var i = 0; i < headers.length; i++) {
-		var header = headers[i], date = parseDateHeader(header);
-
-		if (date) {
-			datesWithHeaders.push({ date: date, header: header });
-		}
-	}
-
-	datesWithHeaders.sort(function (a, b) { return a.date - b.date; });
+	var datesWithHeaders = getDatesWithHeaders(csv);
 
 	for (var i = 0; i < datesWithHeaders.length; i++) {
 		var dateWithHeader = datesWithHeaders[i], header = dateWithHeader.header;
