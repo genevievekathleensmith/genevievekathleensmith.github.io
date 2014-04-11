@@ -193,14 +193,18 @@ d3.csv("EnglandAndWales.csv", function(csv) {
 		
 	var datesWithHeaders = getDatesWithHeaders(csv);
 
-	for (var i = 0; i < datesWithHeaders.length; i++) {
-		var dateWithHeader = datesWithHeaders[i], header = dateWithHeader.header;
+	var dateIndex = 0;
+	setInterval(function () {
+		if (dateIndex < datesWithHeaders.length) {
+			var dateWithHeader = datesWithHeaders[dateIndex], header = dateWithHeader.header;
 
-		svg.selectAll("circle")
-			.transition().duration(1000)
-			.delay(i * 1000)
-			.attr("r",function(d) {return r(+d[header]*factor);});
-	}
+			svg.selectAll("circle")
+				.transition().duration(1000)
+				.attr("r",function(d) {return r(+d[header]*factor);});
+
+			dateIndex++;
+		}
+	}, 1000);
 
 	})
 
