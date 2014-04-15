@@ -213,11 +213,23 @@ d3.csv("EnglandAndWales.csv", function(csv) {
 			.attr("r",function(d) {return r(+d[header]*factor);});
 	};
 
-	var dateIndex = 0;
+	var nextDateAfter = function (date) {
+		var index = indexForDate(date);
+
+		if (index < datesWithHeaders.length - 1) {
+			return datesWithHeaders[index + 1].date;
+		}
+	};
+
+	var date = datesWithHeaders[0].date;
+	setDate(date);
+
 	setInterval(function () {
-		if (dateIndex < datesWithHeaders.length) {
-			setDate(datesWithHeaders[dateIndex].date);
-			dateIndex++;
+		var nextDate = nextDateAfter(date);
+
+		if (nextDate) {
+			setDate(nextDate);
+			date = nextDate;
 		}
 	}, 1000);
 
