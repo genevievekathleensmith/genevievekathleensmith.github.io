@@ -193,14 +193,16 @@ d3.csv("EnglandAndWales.csv", function(csv) {
 		
 	var datesWithHeaders = getDatesWithHeaders(csv);
 
-	var headerForDate = function (date) {
-		for (var i = 0; i < datesWithHeaders.length; i++) {
-			var dateWithHeader = datesWithHeaders[i];
-
-			if (date === dateWithHeader.date) {
-				return dateWithHeader.header;
+	var indexForDate = function (date) {
+		for (var index = 0; index < datesWithHeaders.length; index++) {
+			if (date === datesWithHeaders[index].date) {
+				return index;
 			}
 		}
+	};
+
+	var headerForDate = function (date) {
+		return datesWithHeaders[indexForDate(date)].header;
 	};
 
 	var setDate = function (date) {
