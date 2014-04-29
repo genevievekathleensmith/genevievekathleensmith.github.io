@@ -8,8 +8,6 @@ text {
 	pointer-events: none;
 }
 
-path:hover {fill : orange; stroke: orange}
-
 body{margin:0px;}
 .h,.v{stroke:black;stroke-dasharray:4 4;stroke-width:1;stroke-opacity:.5;}
 .axis path,
@@ -39,6 +37,14 @@ var width = 1500,
 var svg = d3.select("body").append("svg")
 	.attr("width",width)
 	.attr("height",height);
+
+svg.append("text")
+				.attr("x", 750)
+				.attr("y", 50)
+				.attr("fill", "charcoal")
+				.attr("font-size", 12)
+				.attr("font-family","Helvetica Neue")
+				.text("");
 
 svg.append("foreignObject")
     .attr("width", 200)
@@ -97,16 +103,37 @@ d3.csv("USA_space.csv",function(csv){
 		.attr("stroke", "grey") 
 		})
 
+var parseDateHeader = function (header) {
+	var match = header.match(/^X(\d+)\.(\d+)\.(\d+)$/);
 
-d3.csv("USA_data.csv", function(csv) {
+	if (match) {
+		var month = parseInt(match[1]) - 1, day = parseInt(match[2]), year = parseInt(match[3]);
 
-//	csv.sort(function(a,b) { return b.population-a.population; });
+		return new Date(year, month, day);
+	}
+};
+
+var getDatesWithHeaders = function (csv) {
+	var arbitraryRow = csv[0];
+	var headers = d3.keys(arbitraryRow);
+	var datesWithHeaders = [];
+
+	for (var i = 0; i < headers.length; i++) {
+		var header = headers[i], date = parseDateHeader(header);
+
+		if (date) {
+			datesWithHeaders.push({ date: date, header: header });
+		}
+	}
+
+	datesWithHeaders.sort(function (a, b) { return a.date - b.date; });
+
+	return datesWithHeaders;
+};
+
+d3.csv("USA_mortality_data.csv", function(csv) {
+
 	var factor = 1;
-
-//	svg.append("text")
-//		.text("hi")
-//		.attr("x",600)
-//		.attr("y",50)
 
 	svg.selectAll("circle")
 		.data(csv)
@@ -119,238 +146,53 @@ d3.csv("USA_data.csv", function(csv) {
 		.attr("fill","red")
 		.attr("opacity",0.5)
 		
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.attr("r",function(d) {return r(+d.week_1*factor);})
-	
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(1000)
-		.attr("r",function(d) {return r(+d.week_2*factor);})
+	var datesWithHeaders = getDatesWithHeaders(csv);
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(2000)
-		.attr("r",function(d) {return r(+d.week_3*factor);})
+	var indexForDate = function (date) {
+		for (var index = 0; index < datesWithHeaders.length; index++) {
+			if (date === datesWithHeaders[index].date) {
+				return index;
+			}
+		}
+	};
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(3000)
-		.attr("r",function(d) {return r(+d.week_4*factor);})
+	var headerForDate = function (date) {
+		return datesWithHeaders[indexForDate(date)].header;
+	};
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(4000)
-		.attr("r",function(d) {return r(+d.week_5*factor);})
+	var setDate = function (date) {
+		var header = headerForDate(date);
+		
+		svg.select("text")
+			.transition().duration(1000)
+			.text(date);
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(5000)
-		.attr("r",function(d) {return r(+d.week_6*factor);})
+		svg.selectAll("circle")
+			.transition().duration(1000)
+			.attr("r",function(d) {return r(+d[header]*factor);});
+	};
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(6000)
-		.attr("r",function(d) {return r(+d.week_7*factor);})
+	var nextDateAfter = function (date) {
+		var index = indexForDate(date);
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(7000)
-		.attr("r",function(d) {return r(+d.week_8*factor);})
+		if (index < datesWithHeaders.length - 1) {
+			return datesWithHeaders[index + 1].date;
+		}
+	};
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(8000)
-		.attr("r",function(d) {return r(+d.week_9*factor);})
+	var date = datesWithHeaders[0].date;
+	setDate(date);
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(9000)
-		.attr("r",function(d) {return r(+d.week_10*factor);})
+	setInterval(function () {
+		var nextDate = nextDateAfter(date);
 
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(10000)
-		.attr("r",function(d) {return r(+d.week_11*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(11000)
-		.attr("r",function(d) {return r(+d.week_12*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(12000)
-		.attr("r",function(d) {return r(+d.week_13*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(13000)
-		.attr("r",function(d) {return r(+d.week_14*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(14000)
-		.attr("r",function(d) {return r(+d.week_15*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(15000)
-		.attr("r",function(d) {return r(+d.week_16*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(16000)
-		.attr("r",function(d) {return r(+d.week_17*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(17000)
-		.attr("r",function(d) {return r(+d.week_18*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(18000)
-		.attr("r",function(d) {return r(+d.week_19*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(19000)
-		.attr("r",function(d) {return r(+d.week_20*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(20000)
-		.attr("r",function(d) {return r(+d.week_21*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(21000)
-		.attr("r",function(d) {return r(+d.week_22*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(22000)
-		.attr("r",function(d) {return r(+d.week_23*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(23000)
-		.attr("r",function(d) {return r(+d.week_24*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(24000)
-		.attr("r",function(d) {return r(+d.week_25*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(25000)
-		.attr("r",function(d) {return r(+d.week_26*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(26000)
-		.attr("r",function(d) {return r(+d.week_27*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(27000)
-		.attr("r",function(d) {return r(+d.week_28*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(28000)
-		.attr("r",function(d) {return r(+d.week_29*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(29000)
-		.attr("r",function(d) {return r(+d.week_30*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(30000)
-		.attr("r",function(d) {return r(+d.week_31*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(31000)
-		.attr("r",function(d) {return r(+d.week_32*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(32000)
-		.attr("r",function(d) {return r(+d.week_33*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(33000)
-		.attr("r",function(d) {return r(+d.week_34*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(34000)
-		.attr("r",function(d) {return r(+d.week_35*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(35000)
-		.attr("r",function(d) {return r(+d.week_36*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(36000)
-		.attr("r",function(d) {return r(+d.week_37*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(37000)
-		.attr("r",function(d) {return r(+d.week_38*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(38000)
-		.attr("r",function(d) {return r(+d.week_39*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(39000)
-		.attr("r",function(d) {return r(+d.week_40*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(40000)
-		.attr("r",function(d) {return r(+d.week_41*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(41000)
-		.attr("r",function(d) {return r(+d.week_42*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(42000)
-		.attr("r",function(d) {return r(+d.week_43*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(43000)
-		.attr("r",function(d) {return r(+d.week_44*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(44000)
-		.attr("r",function(d) {return r(+d.week_45*factor);})
-
-	svg.selectAll("circle")
-		.transition().duration(1000)
-		.delay(45000)
-		.attr("r",function(d) {return r(+d.week_46*factor);})
-
+		if (nextDate) {
+			setDate(nextDate);
+			date = nextDate;
+		}
+	}, 1000);
 
 	})
-
 
 
 </script>
