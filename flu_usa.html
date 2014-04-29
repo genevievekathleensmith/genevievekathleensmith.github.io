@@ -39,13 +39,15 @@ var svg = d3.select("body").append("svg")
 	.attr("height",height);
 
 svg.append("text")
-				.attr("x", 750)
+				.attr("x", 1000)
 				.attr("y", 50)
 				.attr("fill", "charcoal")
-				.attr("font-size", 12)
+				.attr("font-size", 18)
+				.attr("font-weight","bold")
+				.attr("text-anchor","end")
 				.attr("font-family","Helvetica Neue")
 				.text("");
-
+				
 svg.append("foreignObject")
     .attr("width", 200)
     .attr("height", 500)
@@ -163,9 +165,11 @@ d3.csv("USA_mortality_data.csv", function(csv) {
 	var setDate = function (date) {
 		var header = headerForDate(date);
 		
+		var format = d3.time.format("%e %B, %Y");
+		
 		svg.select("text")
 			.transition().duration(1000)
-			.text(date);
+			.text(format(date));
 
 		svg.selectAll("circle")
 			.transition().duration(1000)
