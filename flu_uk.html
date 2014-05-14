@@ -73,7 +73,7 @@ svg.append("foreignObject")
     .attr("y", 20)
   .append("xhtml:body")
     .style("font", "12px 'Helvetica Neue'")
-    .html("<h1>Flu mortality trends across England and Wales during the 1918 flu pandemic</h1><p>Changes can be seen across space. And through time.<p>The radius of each circle represents the per-capita mortality rate in that location.</p></p>Below are circles indicating mortality rates of 10, 50, and 100 deaths per 1000 people.");
+    .html("<h1>Flu mortality trends across England and Wales during the 1918 flu pandemic</h1><p>The radius of each circle represents the weekly per-capita mortality rate in that location. The changing date is indicated in the top right corner.</p><p>To restart the animation click <a href='http://genevievekathleensmith.github.io/flu_uk'>here</a>.</p></p>Below are circles indicating mortality rates of 5, 20, and 50 deaths per 1000 people.");
 
 var x = d3.scale.linear()
 	.domain([0,660000])
@@ -113,9 +113,9 @@ d3.csv("geo.csv",function(csv){
     
 var legend = svg.append("g")
     .attr("class", "legend")
-    .attr("transform", "translate(" + (width - 650) + "," + (height - 250) + ")")
+    .attr("transform", "translate(" + (width - 675) + "," + (height - 300) + ")")
   .selectAll("g")
-    .data([100,50,10])
+    .data([50,20,5])
   .enter().append("g");
 
 legend.append("ellipse")
